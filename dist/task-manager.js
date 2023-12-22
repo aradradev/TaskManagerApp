@@ -21,5 +21,21 @@ class TaskManager {
     getTasks() {
         return this.tasks;
     }
+    //Adding new feature like sortTaskBy
+    sortTasksBy(criteria) {
+        switch (criteria) {
+            case "priority":
+                this.tasks.sort((a, b) => a.priority.localeCompare(b.priority));
+                break;
+            case "dueDate":
+                this.tasks.sort((a, b) => (a.dueDate || new Date(0)).getTime() - (b.dueDate || new Date(0)).getTime());
+                break;
+            case "completed":
+                this.tasks.sort((a, b) => a.completed === b.completed ? 0 : a.completed ? 1 : -1);
+                break;
+            default:
+                console.log('Invalid sorting criterion.');
+        }
+    }
 }
 exports.TaskManager = TaskManager;
