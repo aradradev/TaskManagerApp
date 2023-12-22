@@ -30,4 +30,21 @@ export class TaskManager {
     getTasks(): Task[] {
         return this.tasks
     }
+
+    //Adding new feature like sortTaskBy
+    sortTasksBy(criteria: 'priority' | 'dueDate' | 'completed'): void {
+        switch (criteria) {
+            case "priority":
+                this.tasks.sort((a, b) => a.priority.localeCompare(b.priority))
+                break;
+            case "dueDate":
+                this.tasks.sort((a, b) => (a.dueDate || new Date(0) as Date).getTime() - (b.dueDate || new Date(0) as Date).getTime())
+                break;
+            case "completed":
+                this.tasks.sort((a, b) => a.completed === b.completed ? 0 : a.completed ? 1 : -1)
+                break;
+            default:
+                console.log('Invalid sorting criterion.')
+        }
+    }
 }
