@@ -91,6 +91,7 @@ function runTaskManager(taskManager) {
                 displayTasks(allTasks);
                 break;
             case '5':
+                console.log('Thank you, have a good time. Bye!');
                 process.exit(0);
             default:
                 console.log('Invalid choice. Please enter a valid number between 1 and 5.');
