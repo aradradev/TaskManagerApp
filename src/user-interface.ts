@@ -79,6 +79,7 @@ export function runTaskManager(taskManager: TaskManager) {
                 displayTasks(allTasks)
                 break;
             case '5':
+                console.log('Thank you, have a good time. Bye!')
                 process.exit(0)
                 
         
