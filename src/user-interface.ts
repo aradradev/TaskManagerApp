@@ -46,12 +46,14 @@ export const taskManager = new TaskManager()
 export function runTaskManager(taskManager: TaskManager) {
     while (true) {
         console.log('\n Task Manager Menu:')
-        console.log('1. Add Task')
-        console.log('2. Edit Task')
-        console.log('3. Delete Task')
-        console.log('4. View Tasks')
-        console.log('5. Sort Tasks')
-        console.log('6. Exit');
+        console.log('[1]. Add Task')
+        console.log('[2]. Edit Task')
+        console.log('[3]. Delete Task')
+        console.log('[4]. View Tasks')
+        console.log('[5]. Sort Tasks')
+        console.log('[6]. Save Tasks to File')
+        console.log('[7]. Load Tasks from File')
+        console.log('[8]. Exit');
 
         const choice = readlineSync.keyIn('Enter your choice: ')
         switch (choice) {
@@ -89,6 +91,12 @@ export function runTaskManager(taskManager: TaskManager) {
                 }
                 break;
             case '6':
+                taskManager.saveTasksToFile();
+                break;
+            case '7':
+                taskManager.loadTasksFromFile()
+                break;
+            case '8':
                 console.log('Thank you, have a good time. Bye!')
                 process.exit(0)
                 
