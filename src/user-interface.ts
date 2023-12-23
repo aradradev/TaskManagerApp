@@ -46,11 +46,14 @@ export const taskManager = new TaskManager()
 export function runTaskManager(taskManager: TaskManager) {
     while (true) {
         console.log('\n Task Manager Menu:')
-        console.log('1. Add Task')
-        console.log('2. Edit Task')
-        console.log('3. Delete Task')
-        console.log('4. View Tasks')
-        console.log('5. Exit');
+        console.log('[1]. Add Task')
+        console.log('[2]. Edit Task')
+        console.log('[3]. Delete Task')
+        console.log('[4]. View Tasks')
+        console.log('[5]. Sort Tasks')
+        console.log('[6]. Save Tasks to File')
+        console.log('[7]. Load Tasks from File')
+        console.log('[8]. Exit');
 
         const choice = readlineSync.keyIn('Enter your choice: ')
         switch (choice) {
@@ -59,7 +62,8 @@ export function runTaskManager(taskManager: TaskManager) {
                 taskManager.addTask({
                     ...newTaskInput,
                     id: taskManager.getTasks().length + 1,
-                    completed: false
+                    completed: false,
+                    dueDate: new Date(newTaskInput.dueDate || 0)
                 } as Task);
                 console.log('Task added successfully');
                 break;
@@ -79,6 +83,20 @@ export function runTaskManager(taskManager: TaskManager) {
                 displayTasks(allTasks)
                 break;
             case '5':
+                const sortCriterionIndex = readlineSync.keyInSelect(['priority', 'dueDate', 'completed'], 'Select sorting criterion: ')
+                if (sortCriterionIndex !== -1) {
+                    const sortCriterion = ['priority', 'dueDate', 'completed'][sortCriterionIndex]
+                    taskManager.sortTasksBy(sortCriterion as 'priority' | 'dueDate' | 'completed')
+                    console.log(`Tasks sorted by ${sortCriterion}. `);
+                }
+                break;
+            case '6':
+                taskManager.saveTasksToFile();
+                break;
+            case '7':
+                taskManager.loadTasksFromFile()
+                break;
+            case '8':
                 console.log('Thank you, have a good time. Bye!')
                 process.exit(0)
                 

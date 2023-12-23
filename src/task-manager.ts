@@ -1,4 +1,6 @@
 //src/main.ts
+import * as fs from 'fs'
+import * as path from 'path'
 
 export interface Task{
     id: number;
@@ -29,5 +31,58 @@ export class TaskManager {
 
     getTasks(): Task[] {
         return this.tasks
+    }
+
+    //Adding new feature like sortTaskBy
+    sortTasksBy(criteria: 'priority' | 'dueDate' | 'completed'): void {
+        switch (criteria) {
+            case "priority":
+                this.tasks.sort((a, b) => a.priority.localeCompare(b.priority))
+                break;
+            case "dueDate":
+                this.tasks.sort((a, b) => (a.dueDate || new Date(0) as Date).getTime() - (b.dueDate || new Date(0) as Date).getTime())
+                break;
+            case "completed":
+                this.tasks.sort((a, b) => a.completed === b.completed ? 0 : a.completed ? 1 : -1)
+                break;
+            default:
+                console.log('Invalid sorting criterion.')
+        }
+    }
+
+    //Save file implementation
+    saveTasksToFile(): void{
+        const tasksJson = JSON.stringify(this.tasks, null, 2)
+        const defaultFileName = 'tasks-manager.json'
+        const folderPath = 'DATABASE'
+        if (!fs.existsSync(folderPath)) {
+            fs.mkdirSync(folderPath)
+        }
+
+        const filePath = path.join(folderPath, defaultFileName)
+        fs.writeFileSync(filePath, tasksJson)
+        
+        console.log(`Tasks saved to ${filePath}.`);
+    }
+
+    //Load file implementation
+    loadTasksFromFile(): void{
+        const defaultFileName = 'tasks-manager.json'
+        const folderPath = 'DATABASE'
+
+        const filePath = path.join(folderPath, defaultFileName)
+
+        try {
+            const tasksJson = fs.readFileSync(filePath, 'utf-8')
+            const loadedTasks = JSON.parse(tasksJson)
+            if (Array.isArray(loadedTasks)) {
+                this.tasks = loadedTasks
+                console.log(`Tasks loaded from ${filePath}.`);
+            } else {
+                console.error('Invalid file format. Unable to load tasks.');
+            }
+        } catch (error: any) {
+            console.error(`Error loading tasks from ${filePath}: ${error.message}`)
+        }
     }
 }
