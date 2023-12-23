@@ -1,7 +1,32 @@
 "use strict";
-//src/main.ts
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TaskManager = void 0;
+//src/main.ts
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 class TaskManager {
     constructor() {
         this.tasks = [];
@@ -35,6 +60,38 @@ class TaskManager {
                 break;
             default:
                 console.log('Invalid sorting criterion.');
+        }
+    }
+    //Save file implementation
+    saveTasksToFile() {
+        const tasksJson = JSON.stringify(this.tasks, null, 2);
+        const defaultFileName = 'tasks-manager.json';
+        const folderPath = 'DATABASE';
+        if (!fs.existsSync(folderPath)) {
+            fs.mkdirSync(folderPath);
+        }
+        const filePath = path.join(folderPath, defaultFileName);
+        fs.writeFileSync(filePath, tasksJson);
+        console.log(`Tasks saved to ${filePath}.`);
+    }
+    //Load file implementation
+    loadTasksFromFile() {
+        const defaultFileName = 'tasks-manager.json';
+        const folderPath = 'DATABASE';
+        const filePath = path.join(folderPath, defaultFileName);
+        try {
+            const tasksJson = fs.readFileSync(filePath, 'utf-8');
+            const loadedTasks = JSON.parse(tasksJson);
+            if (Array.isArray(loadedTasks)) {
+                this.tasks = loadedTasks;
+                console.log(`Tasks loaded from ${filePath}.`);
+            }
+            else {
+                console.error('Invalid file format. Unable to load tasks.');
+            }
+        }
+        catch (error) {
+            console.error(`Error loading tasks from ${filePath}: ${error.message}`);
         }
     }
 }
