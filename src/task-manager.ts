@@ -85,4 +85,14 @@ export class TaskManager {
             console.error(`Error loading tasks from ${filePath}: ${error.message}`)
         }
     }
+
+    //Local Storage Save File
+    saveFileToLocalStorage(): void{
+        const tasksJson = JSON.stringify(this.tasks)
+        localStorage.setItem('tasks', tasksJson)
+        console.log('Tasks saved to local storage.');
+
+    }
+
+    
 }
