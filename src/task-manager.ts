@@ -86,13 +86,4 @@ export class TaskManager {
         }
     }
 
-    //Local Storage Save File
-    saveFileToLocalStorage(): void{
-        const tasksJson = JSON.stringify(this.tasks)
-        localStorage.setItem('tasks', tasksJson)
-        console.log('Tasks saved to local storage.');
-
-    }
-
-    
 }
