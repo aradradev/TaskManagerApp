@@ -33,12 +33,14 @@ const task_manager_1 = require("./task-manager");
 const chalk_1 = __importDefault(require("chalk"));
 //Get User Input Function
 function getUserInput() {
+    const category = readlineSync.question('Enter task category: ');
     const title = readlineSync.question('Enter task title: ');
     const priorityOptions = ['low', 'medium', 'high'];
     const priorityIndex = readlineSync.keyInSelect(priorityOptions, 'Select task priority: ');
     const priority = priorityIndex !== -1 ? priorityOptions[priorityIndex] : 'low';
     const dueDate = readlineSync.question('Enter due Date (optional , format: YYYY-MM-DD: ') || '';
     return {
+        category,
         title,
         priority: priority,
         dueDate,
@@ -54,6 +56,7 @@ function displayTasks(tasks) {
         tasks.forEach(task => {
             console.log(`
                 ID: ${chalk_1.default.blue(task.id)},
+                Category: ${chalk_1.default.blueBright(task.category) || 'Not set'}
                 Title: ${chalk_1.default.yellow(task.title)},
                 Priority: ${chalk_1.default.red(task.priority)},
                 Due Date: ${chalk_1.default.cyan(task.dueDate || 'Not set')},
