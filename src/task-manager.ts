@@ -86,5 +86,5 @@ export class TaskManager {
             console.error(`${chalk.red(`Error loading tasks from ${filePath}: ${error.message}`)}`)
         }
     }
-    
+
 }
