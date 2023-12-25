@@ -5,6 +5,7 @@ import chalk from 'chalk'
 
 
 interface UserInput {
+    category: string
     title?: string
     priority?: 'low' | 'medium'| 'high'
     dueDate?: string
@@ -12,6 +13,7 @@ interface UserInput {
 
 //Get User Input Function
 export function getUserInput(): UserInput {
+    const category = readlineSync.question('Enter task category: ')
     const title = readlineSync.question('Enter task title: ')
     const priorityOptions = ['low', 'medium', 'high']
     const priorityIndex = readlineSync.keyInSelect(priorityOptions, 'Select task priority: ')
@@ -19,6 +21,7 @@ export function getUserInput(): UserInput {
     const dueDate = readlineSync.question('Enter due Date (optional , format: YYYY-MM-DD: ') || ''
 
     return {
+        category,
         title,
         priority: priority as 'low' | 'medium' | 'high',
         dueDate,
@@ -33,6 +36,7 @@ export function displayTasks(tasks: Task[]): void{
         tasks.forEach(task => {
             console.log(`
                 ID: ${chalk.blue(task.id)},
+                Category: ${chalk.blueBright(task.category) || 'Not set'}
                 Title: ${chalk.yellow(task.title)},
                 Priority: ${chalk.red(task.priority)},
                 Due Date: ${chalk.cyan(task.dueDate || 'Not set')},
