@@ -1,4 +1,5 @@
 //src/main.ts
+import chalk from 'chalk';
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -46,7 +47,7 @@ export class TaskManager {
                 this.tasks.sort((a, b) => a.completed === b.completed ? 0 : a.completed ? 1 : -1)
                 break;
             default:
-                console.log('Invalid sorting criterion.')
+                console.log(chalk.red('Invalid sorting criterion.'))
         }
     }
 
@@ -62,10 +63,10 @@ export class TaskManager {
         const filePath = path.join(folderPath, defaultFileName)
         fs.writeFileSync(filePath, tasksJson)
         
-        console.log(`Tasks saved to ${filePath}.`);
+        console.log(`${chalk.green(`Tasks saved to ${filePath}.`)}`);
     }
 
-    //Load file implementation
+    //Load file implementation from JSON
     loadTasksFromFile(): void{
         const defaultFileName = 'tasks-manager.json'
         const folderPath = 'DATABASE'
@@ -77,13 +78,13 @@ export class TaskManager {
             const loadedTasks = JSON.parse(tasksJson)
             if (Array.isArray(loadedTasks)) {
                 this.tasks = loadedTasks
-                console.log(`Tasks loaded from ${filePath}.`);
+                console.log(`${chalk.green(`Tasks loaded from ${filePath}.`)}`);
             } else {
-                console.error('Invalid file format. Unable to load tasks.');
+                console.error(chalk.red('Invalid file format. Unable to load tasks.'));
             }
         } catch (error: any) {
-            console.error(`Error loading tasks from ${filePath}: ${error.message}`)
+            console.error(`${chalk.red(`Error loading tasks from ${filePath}: ${error.message}`)}`)
         }
     }
-
+    
 }
