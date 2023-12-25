@@ -22,9 +22,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TaskManager = void 0;
 //src/main.ts
+const chalk_1 = __importDefault(require("chalk"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 class TaskManager {
@@ -59,7 +63,7 @@ class TaskManager {
                 this.tasks.sort((a, b) => a.completed === b.completed ? 0 : a.completed ? 1 : -1);
                 break;
             default:
-                console.log('Invalid sorting criterion.');
+                console.log(chalk_1.default.red('Invalid sorting criterion.'));
         }
     }
     //Save file implementation
@@ -72,9 +76,9 @@ class TaskManager {
         }
         const filePath = path.join(folderPath, defaultFileName);
         fs.writeFileSync(filePath, tasksJson);
-        console.log(`Tasks saved to ${filePath}.`);
+        console.log(`${chalk_1.default.green(`Tasks saved to ${filePath}.`)}`);
     }
-    //Load file implementation
+    //Load file implementation from JSON
     loadTasksFromFile() {
         const defaultFileName = 'tasks-manager.json';
         const folderPath = 'DATABASE';
@@ -84,14 +88,14 @@ class TaskManager {
             const loadedTasks = JSON.parse(tasksJson);
             if (Array.isArray(loadedTasks)) {
                 this.tasks = loadedTasks;
-                console.log(`Tasks loaded from ${filePath}.`);
+                console.log(`${chalk_1.default.green(`Tasks loaded from ${filePath}.`)}`);
             }
             else {
-                console.error('Invalid file format. Unable to load tasks.');
+                console.error(chalk_1.default.red('Invalid file format. Unable to load tasks.'));
             }
         }
         catch (error) {
-            console.error(`Error loading tasks from ${filePath}: ${error.message}`);
+            console.error(`${chalk_1.default.red(`Error loading tasks from ${filePath}: ${error.message}`)}`);
         }
     }
 }
