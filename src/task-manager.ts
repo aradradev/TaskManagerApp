@@ -9,6 +9,7 @@ export interface Task{
     priority: 'low' | 'medium' | 'high';
     dueDate?: Date | undefined;
     completed: boolean;
+    category: string
 }
 
 export class TaskManager {
