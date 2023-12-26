@@ -31,21 +31,30 @@ exports.TaskManager = void 0;
 const chalk_1 = __importDefault(require("chalk"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const notifier = __importStar(require("node-notifier"));
 class TaskManager {
     constructor() {
         this.tasks = [];
+        this.undoStack = [];
+        this.redoStack = [];
     }
     addTask(task) {
+        this.pushToUndoStack();
         this.tasks.push(task);
+        this.pushToRedoStack();
     }
     editTask(taskId, updatedTask) {
+        this.pushToUndoStack();
         const taskIndex = this.tasks.findIndex((task) => task.id === taskId);
         if (taskIndex !== -1) {
             this.tasks[taskIndex] = Object.assign(Object.assign({}, this.tasks[taskIndex]), updatedTask);
         }
+        this.pushToRedoStack();
     }
     deleteTask(taskId) {
+        this.pushToUndoStack();
         this.tasks = this.tasks.filter((task) => task.id !== taskId);
+        this.pushToRedoStack();
     }
     getTasks() {
         return this.tasks;
@@ -96,6 +105,80 @@ class TaskManager {
         }
         catch (error) {
             console.error(`${chalk_1.default.red(`Error loading tasks from ${filePath}: ${error.message}`)}`);
+        }
+    }
+    //add new method to get current state
+    getCurrentState() {
+        return [...this.tasks];
+    }
+    //add new method to push the current state to undo stack
+    pushToUndoStack() {
+        this.undoStack.push(this.getCurrentState());
+    }
+    //add method to push the current state to redo stack
+    pushToRedoStack() {
+        this.redoStack.push(this.getCurrentState());
+    }
+    //add method to pop state from the undo stack
+    popFromUndoStack() {
+        return this.undoStack.pop();
+    }
+    //add method to pop state from the redi stack
+    popFromRedoStack() {
+        return this.redoStack.pop();
+    }
+    //Implement Undo methods
+    undo() {
+        if (this.undoStack.length > 0) {
+            const prevState = this.popFromUndoStack();
+            if (prevState) {
+                this.tasks = prevState;
+                this.pushToRedoStack();
+            }
+        }
+    }
+    //Implement Redo methods
+    redo() {
+        if (this.redoStack.length > 0) {
+            const nextState = this.popFromRedoStack();
+            if (nextState) {
+                this.tasks = nextState;
+                this.pushToUndoStack();
+            }
+        }
+    }
+    //Add reminder method: I have used notifier from node
+    checkDueDateReminders() {
+        const today = new Date();
+        for (const task of this.tasks) {
+            if (task.dueDate && this.isDueDateApproaching(task.dueDate, today)) {
+                notifier.notify({
+                    title: 'Task Reminder',
+                    message: `Task "${task.title}" is approaching its due date!`
+                });
+            }
+        }
+    }
+    isDueDateApproaching(dueDate, today) {
+        const daysBeforeReminder = 2;
+        const timeDifference = dueDate.getTime() - today.getTime();
+        const daysDifference = timeDifference / (1000 * 3600 * 24);
+        return daysDifference <= daysBeforeReminder;
+    }
+    //Add new method to Task Manager Filtering features
+    filterTasks(criteria) {
+        switch (criteria) {
+            case 'category':
+                return this.tasks.filter((task) => task.category === 'work');
+            case 'priority':
+                return this.tasks.filter((task) => task.priority === 'high');
+            case 'dueDate':
+                return this.tasks.filter((task) => task.dueDate && task.dueDate.getTime() < new Date().getTime());
+            case 'completed':
+                return this.tasks.filter(task => task.completed);
+            default:
+                console.log(chalk_1.default.red('Invalid filtering criterion.'));
+                return [];
         }
     }
 }
