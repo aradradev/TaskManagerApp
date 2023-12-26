@@ -30,6 +30,7 @@ exports.runTaskManager = exports.taskManager = exports.displayTasks = exports.ge
 //src/main1.ts
 const readlineSync = __importStar(require("readline-sync"));
 const task_manager_1 = require("./task-manager");
+//this is for coloring my command for better user friendly experience.
 const chalk_1 = __importDefault(require("chalk"));
 //Get User Input Function
 function getUserInput() {
@@ -50,7 +51,7 @@ exports.getUserInput = getUserInput;
 //Display Task Function
 function displayTasks(tasks) {
     if (tasks.length === 0) {
-        console.log('No task available!');
+        console.log(chalk_1.default.yellow('No task available!'));
     }
     else {
         tasks.forEach(task => {
@@ -67,6 +68,9 @@ function displayTasks(tasks) {
 }
 exports.displayTasks = displayTasks;
 exports.taskManager = new task_manager_1.TaskManager();
+setInterval(() => {
+    exports.taskManager.checkDueDateReminders();
+}, 24 * 60 * 60 * 1000);
 function runTaskManager(taskManager) {
     while (true) {
         console.log(chalk_1.default.green('\n Task Manager Menu:'));
@@ -77,7 +81,10 @@ function runTaskManager(taskManager) {
         console.log(chalk_1.default.blue('[5]. Sort Tasks'));
         console.log(chalk_1.default.blue('[6]. Save Tasks to File'));
         console.log(chalk_1.default.blue('[7]. Load Tasks from File'));
-        console.log(chalk_1.default.blue('[8]. Exit'));
+        console.log(chalk_1.default.blue('[8]. Undo Task'));
+        console.log(chalk_1.default.blue('[9]. Redo Task'));
+        console.log(chalk_1.default.blue('[A]. Filter Tasks'));
+        console.log(chalk_1.default.blue('[0]. Exit'));
         const choice = readlineSync.keyIn('Enter your choice: ');
         switch (choice) {
             case '1':
@@ -115,10 +122,31 @@ function runTaskManager(taskManager) {
                 taskManager.loadTasksFromFile();
                 break;
             case '8':
-                console.log(chalk_1.default.green('Thank you, have a good time. Bye!'));
+                taskManager.undo();
+                console.log(chalk_1.default.yellow('Undo operation performed.'));
+                break;
+            case '9':
+                taskManager.redo();
+                console.log(chalk_1.default.yellow('Redo operation performed.'));
+                break;
+            case 'A':
+                const filterOptions = ['category', 'priority', 'dueDate', 'completed'];
+                const filterCriterionIndex = readlineSync.keyInSelect(filterOptions);
+                if (filterCriterionIndex !== -1) {
+                    const filterCriterion = ['category', 'priority', 'dueDate', 'completed'][filterCriterionIndex]; //assertion here.
+                    const filteredTasks = taskManager.filterTasks(filterCriterion);
+                    displayTasks(filteredTasks);
+                    console.log(chalk_1.default.green(`Tasks filtered by "${filterCriterion}".`));
+                }
+                else {
+                    console.log(chalk_1.default.yellow('No filter criterion selected.'));
+                }
+                break;
+            case '0':
+                console.log(chalk_1.default.yellow('Thank you, have a good time. Bye :)'));
                 process.exit(0);
             default:
-                console.log(chalk_1.default.red('Invalid choice. Please enter a valid number between 1 and 5.'));
+                console.log(chalk_1.default.red('Invalid choice. Please enter a valid number between 0 and 9.'));
         }
     }
 }
