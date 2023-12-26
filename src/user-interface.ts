@@ -1,6 +1,7 @@
 //src/main1.ts
 import * as readlineSync from 'readline-sync'
 import { Task, TaskManager } from './task-manager'
+//this is for coloring my command for better user friendly experience.
 import chalk from 'chalk'
 
 
@@ -31,7 +32,7 @@ export function getUserInput(): UserInput {
 //Display Task Function
 export function displayTasks(tasks: Task[]): void{
     if (tasks.length === 0) {
-        console.log('No task available!')
+        console.log(chalk.yellow('No task available!'))
     } else {
         tasks.forEach(task => {
             console.log(`
@@ -48,6 +49,10 @@ export function displayTasks(tasks: Task[]): void{
 
 export const taskManager = new TaskManager()
 
+setInterval(() => {
+    taskManager.checkDueDateReminders()
+}, 24 * 60 * 60 * 1000)
+
 export function runTaskManager(taskManager: TaskManager) {
     while (true) {
         console.log(chalk.green('\n Task Manager Menu:'))
@@ -58,7 +63,10 @@ export function runTaskManager(taskManager: TaskManager) {
         console.log(chalk.blue('[5]. Sort Tasks'))
         console.log(chalk.blue('[6]. Save Tasks to File'))
         console.log(chalk.blue('[7]. Load Tasks from File'))
-        console.log(chalk.blue('[8]. Exit'));
+        console.log(chalk.blue('[8]. Undo Task'))
+        console.log(chalk.blue('[9]. Redo Task'))
+        console.log(chalk.blue('[A]. Filter Tasks'))
+        console.log(chalk.blue('[0]. Exit'));
 
         const choice = readlineSync.keyIn('Enter your choice: ')
         switch (choice) {
@@ -102,12 +110,33 @@ export function runTaskManager(taskManager: TaskManager) {
                 taskManager.loadTasksFromFile()
                 break;
             case '8':
-                console.log(chalk.green('Thank you, have a good time. Bye!'))
+                taskManager.undo();
+                console.log(chalk.yellow('Undo operation performed.'));
+                break;
+            case '9':
+                taskManager.redo()
+                console.log(chalk.yellow('Redo operation performed.'));
+                break;
+            case 'A':
+                const filterOptions = ['category', 'priority', 'dueDate', 'completed']
+                const filterCriterionIndex = readlineSync.keyInSelect(filterOptions)
+                if (filterCriterionIndex !== -1) {
+                    const filterCriterion = ['category', 'priority', 'dueDate', 'completed'][filterCriterionIndex] as 'category' | 'priority' | 'dueDate' | 'completed' //assertion here.
+                    const filteredTasks = taskManager.filterTasks(filterCriterion)
+                    displayTasks(filteredTasks)
+                    console.log(chalk.green(`Tasks filtered by "${filterCriterion}".`));
+                    
+                } else {
+                    console.log(chalk.yellow('No filter criterion selected.'));
+                }
+                break;
+            case '0':
+                console.log(chalk.yellow('Thank you, have a good time. Bye :)'))
                 process.exit(0)
                 
         
             default:
-                console.log(chalk.red('Invalid choice. Please enter a valid number between 1 and 5.'))
+                console.log(chalk.red('Invalid choice. Please enter a valid number between 0 and 9.'))
         }
     }
 }
